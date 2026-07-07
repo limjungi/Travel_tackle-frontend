@@ -1,9 +1,11 @@
 import { Icon } from '@iconify/react'
+import Section from './ui/Section'
+import Button from './ui/Button'
 
 export default function Hero() {
   return (
     <section className="bg-gradient-to-b from-[#F0F7FD] to-white">
-      <div className="max-w-[1180px] mx-auto px-6 pt-16 pb-32 grid md:grid-cols-2 gap-10 items-center">
+      <Section as="div" className="pt-16 pb-32 grid md:grid-cols-2 gap-10 items-center">
 
         <div>
           <h1 className="text-[38px] leading-[1.25] font-extrabold tracking-tight text-slate-900">
@@ -27,9 +29,9 @@ export default function Hero() {
               placeholder="여행지, 키워드, 트래블태그로 검색해보세요"
               className="bg-transparent border-none outline-none text-[14px] text-slate-900 placeholder-slate-400 flex-1 min-w-0"
             />
-            <button className="shrink-0 px-5 py-2.5 bg-brand text-white rounded-xl text-[13.5px] font-bold hover:bg-brand-dark transition-all">
+            <Button className="shrink-0 px-5 py-2.5 rounded-xl text-[13.5px] font-bold">
               검색하기
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -159,7 +161,7 @@ export default function Hero() {
             </div>
           </div>
         </div>
-      </div>
+      </Section>
     </section>
   )
 }

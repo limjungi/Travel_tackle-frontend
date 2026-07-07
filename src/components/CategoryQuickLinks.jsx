@@ -1,4 +1,7 @@
 import { Icon } from '@iconify/react'
+import Section from './ui/Section'
+import Card from './ui/Card'
+import IconBadge from './ui/IconBadge'
 
 const categories = [
   { label: '관광지 탐색', icon: 'solar:compass-linear', bg: 'bg-brand-light', color: '#0D9488' },
@@ -11,21 +14,23 @@ const categories = [
 
 export default function CategoryQuickLinks() {
   return (
-    <section className="max-w-[1180px] mx-auto px-6 pt-4 pb-14">
+    <Section className="pt-4 pb-14">
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
         {categories.map((c) => (
-          <a
+          <Card
             key={c.label}
+            as="a"
             href="#"
-            className="lift flex flex-col items-center gap-2.5 bg-white border border-slate-100 rounded-2xl py-6 shadow-[0_4px_16px_rgba(15,23,42,0.05)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition-all"
+            shadow
+            className="flex flex-col items-center gap-2.5 py-6 transition-all"
           >
-            <div className={`w-12 h-12 rounded-full ${c.bg} flex items-center justify-center`}>
+            <IconBadge className={`w-12 h-12 rounded-full ${c.bg}`}>
               <Icon icon={c.icon} width={22} color={c.color} />
-            </div>
+            </IconBadge>
             <span className="text-[12.5px] font-semibold text-slate-700">{c.label}</span>
-          </a>
+          </Card>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }

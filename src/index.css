@@ -7,6 +7,12 @@
   --color-brand-light: #f0fdfa;
   --color-brand-dark: #0f766e;
   --color-brand-mid: #14b8a6;
+
+  --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.05);
+  --shadow-card-hover: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-popup: 0 30px 70px rgba(15, 23, 42, 0.28);
+  --shadow-float: 0 16px 36px rgba(13, 148, 136, 0.45);
+  --shadow-float-hover: 0 20px 44px rgba(13, 148, 136, 0.55);
 }
 
 * {

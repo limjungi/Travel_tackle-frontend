@@ -1,4 +1,7 @@
 import { Icon } from '@iconify/react'
+import Section from './ui/Section'
+import SectionHeader from './ui/SectionHeader'
+import Card from './ui/Card'
 
 const plans = [
   { seed: 'plan-jeju', user: 'user1', name: '여행에니아', title: '제주 서쪽 감성 로드', meta: '3박 4일 · 15개 장소', likes: 342 },
@@ -10,15 +13,12 @@ const plans = [
 
 export default function PopularPlans() {
   return (
-    <section className="max-w-[1180px] mx-auto px-6 pb-14">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[19px] font-bold text-slate-900">인기 계획</h2>
-        <a href="#" className="text-[12.5px] font-semibold text-slate-400 hover:text-slate-700 transition-all">더보기 &gt;</a>
-      </div>
+    <Section className="pb-14">
+      <SectionHeader title="인기 계획" />
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {plans.map((p) => (
-          <a key={p.seed} href="#" className="lift block rounded-2xl overflow-hidden border border-slate-100 bg-white">
+          <Card key={p.seed} as="a" href="#" className="block overflow-hidden">
             <img src={`https://picsum.photos/seed/${p.seed}/320/220`} className="w-full h-[120px] object-cover" alt={p.title} />
             <div className="p-3">
               <div className="flex items-center gap-1.5 mb-1.5">
@@ -32,9 +32,9 @@ export default function PopularPlans() {
                 {p.likes}
               </div>
             </div>
-          </a>
+          </Card>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }
