@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
+import { Link } from 'react-router-dom'
 import Section from './ui/Section'
 import IconBadge from './ui/IconBadge'
+import Button from './ui/Button'
+import { useAuth } from '../context/AuthContext'
 import logoHorizontal from '../assets/logo-horizontal.svg'
 
 const navLinks = [
@@ -14,13 +17,14 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { user } = useAuth()
 
   return (
     <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-100">
       <Section as="div" padding="px-4 sm:px-6" className="flex items-center gap-6 h-16">
-        <div className="flex items-center shrink-0">
+        <Link to="/" className="flex items-center shrink-0">
           <img src={logoHorizontal} alt="트레블 참견" className="h-[35px] w-auto" />
-        </div>
+        </Link>
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-1">
@@ -40,18 +44,31 @@ export default function Navbar() {
         </div>
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
-          <IconBadge as="button" className="relative w-9 h-9 rounded-full text-slate-400 hover:bg-slate-50 transition-all shrink-0">
-            <Icon icon="solar:bell-linear" width={19} />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500" />
-          </IconBadge>
+          {user ? (
+            <>
+              <IconBadge as="button" className="relative w-9 h-9 rounded-full text-slate-400 hover:bg-slate-50 transition-all shrink-0">
+                <Icon icon="solar:bell-linear" width={19} />
+                <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500" />
+              </IconBadge>
 
-          <button className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border border-slate-200 hover:border-slate-300 transition-all shrink-0">
-            <IconBadge className="w-7 h-7 rounded-full bg-brand-light shrink-0">
-              <Icon icon="solar:user-bold" width={14} color="#0D9488" />
-            </IconBadge>
-            <span className="text-[12.5px] font-bold text-slate-700">123</span>
-            <Icon icon="solar:alt-arrow-down-linear" width={12} color="#94A3B8" />
-          </button>
+              <button className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border border-slate-200 hover:border-slate-300 transition-all shrink-0">
+                <IconBadge className="w-7 h-7 rounded-full bg-brand-light shrink-0">
+                  <Icon icon="solar:user-bold" width={14} color="#0D9488" />
+                </IconBadge>
+                <span className="text-[12.5px] font-bold text-slate-700">{user.name}</span>
+                <Icon icon="solar:alt-arrow-down-linear" width={12} color="#94A3B8" />
+              </button>
+            </>
+          ) : (
+            <Button
+              as={Link}
+              to="/login"
+              variant="light"
+              className="px-4 py-2 rounded-full text-[13px] font-bold shrink-0"
+            >
+              로그인
+            </Button>
+          )}
 
           {/* Mobile menu toggle */}
           <IconBadge

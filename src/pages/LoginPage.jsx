@@ -1,0 +1,118 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Icon } from '@iconify/react'
+import AuthLayout from '../components/auth/AuthLayout'
+import PasswordResetModal from '../components/auth/PasswordResetModal'
+import Button from '../components/ui/Button'
+import FormField from '../components/ui/FormField'
+import { useAuth } from '../context/AuthContext'
+import * as preferencesApi from '../api/preferences'
+
+export default function LoginPage() {
+  const navigate = useNavigate()
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showReset, setShowReset] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await login({ email, password })
+      try {
+        await preferencesApi.getPreferences()
+        navigate('/')
+      } catch {
+        navigate('/onboarding/welcome')
+      }
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError('이메일 또는 비밀번호가 올바르지 않아요.')
+      } else {
+        setError('로그인에 실패했어요. 잠시 후 다시 시도해주세요.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <AuthLayout>
+      <h1 className="text-[13px] font-semibold text-brand-dark mb-1">환영해요</h1>
+      <p className="text-[22px] font-extrabold text-slate-800 mb-7">이메일로 로그인해주세요</p>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <FormField
+          label="이메일"
+          type="email"
+          placeholder="test@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+        <div>
+          <FormField
+            label="비밀번호"
+            type="password"
+            placeholder="비밀번호를 입력해주세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowReset(true)}
+            className="mt-1.5 block ml-auto text-[12.5px] font-medium text-slate-400 hover:text-slate-600 transition-all"
+          >
+            비밀번호 찾기
+          </button>
+        </div>
+
+        {error && <p className="text-[12.5px] text-rose-500 -mt-1">{error}</p>}
+
+        <Button type="submit" disabled={loading} className="h-12 rounded-xl font-bold text-[15px] disabled:opacity-50">
+          {loading ? '로그인 중...' : '로그인'}
+        </Button>
+      </form>
+
+      <div className="flex items-center gap-3 my-6">
+        <div className="h-px flex-1 bg-slate-100" />
+        <span className="text-[12px] text-slate-400">또는</span>
+        <div className="h-px flex-1 bg-slate-100" />
+      </div>
+
+      <div className="flex flex-col gap-2.5">
+        <a
+          href="/oauth2/authorization/kakao"
+          className="h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-[14px] transition-all"
+          style={{ background: '#FEE500', color: '#191600' }}
+        >
+          <Icon icon="ri:kakao-talk-fill" width={19} />
+          카카오로 시작하기
+        </a>
+        <a
+          href="/oauth2/authorization/google"
+          className="h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-[14px] border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all"
+        >
+          <Icon icon="logos:google-icon" width={17} />
+          Google로 계속하기
+        </a>
+      </div>
+
+      <p className="text-center text-[13px] text-slate-500 mt-7">
+        계정이 없으신가요?{' '}
+        <Link to="/signup" className="font-bold text-brand-dark">
+          회원가입
+        </Link>
+      </p>
+
+      {showReset && <PasswordResetModal onClose={() => setShowReset(false)} />}
+    </AuthLayout>
+  )
+}
