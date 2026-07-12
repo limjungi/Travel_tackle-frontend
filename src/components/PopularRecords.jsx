@@ -1,3 +1,7 @@
+import Section from './ui/Section'
+import SectionHeader from './ui/SectionHeader'
+import Card from './ui/Card'
+
 const records = [
   { seed: 'rec-jeju-sunset', user: 'user6', name: 'wanderlust', title: '제주 일몰 드라이브' },
   { seed: 'rec-gangneung-solo', user: 'user7', name: '여행하는누나', title: '강릉 혼자 여행' },
@@ -8,15 +12,12 @@ const records = [
 
 export default function PopularRecords() {
   return (
-    <section className="max-w-[1180px] mx-auto px-6 pb-16">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[19px] font-bold text-slate-900">인기 기록</h2>
-        <a href="#" className="text-[12.5px] font-semibold text-slate-400 hover:text-slate-700 transition-all">더보기 &gt;</a>
-      </div>
+    <Section className="pb-16">
+      <SectionHeader title="인기 기록" />
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {records.map((r) => (
-          <a key={r.seed} href="#" className="lift block rounded-2xl overflow-hidden border border-slate-100 bg-white">
+          <Card key={r.seed} as="a" href="#" className="block overflow-hidden">
             <img src={`https://picsum.photos/seed/${r.seed}/320/220`} className="w-full h-[150px] object-cover" alt={r.title} />
             <div className="p-3">
               <div className="flex items-center gap-1.5">
@@ -25,9 +26,9 @@ export default function PopularRecords() {
               </div>
               <div className="text-[13px] font-bold text-slate-900 mt-1.5">{r.title}</div>
             </div>
-          </a>
+          </Card>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }

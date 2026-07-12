@@ -1,4 +1,8 @@
 import { Icon } from '@iconify/react'
+import Section from './ui/Section'
+import SectionHeader from './ui/SectionHeader'
+import Card from './ui/Card'
+import Button from './ui/Button'
 
 const plans = [
   { title: '제주도 3박 4일 힐링 여행', date: '2026.07.06 ~ 2026.07.09', progress: 60 },
@@ -9,16 +13,13 @@ const plans = [
 
 export default function InProgressPlans() {
   return (
-    <section className="max-w-[1180px] mx-auto px-6 pb-14">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[19px] font-bold text-slate-900">작성 중인 계획</h2>
-        <a href="#" className="text-[12.5px] font-semibold text-slate-400 hover:text-slate-700 transition-all">더보기 &gt;</a>
-      </div>
+    <Section className="pb-14">
+      <SectionHeader title="작성 중인 계획" />
 
       <div className="relative">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {plans.map((p) => (
-            <div key={p.title} className="lift bg-white border border-slate-100 rounded-2xl p-4">
+            <Card key={p.title} className="p-4">
               <Icon icon="solar:map-point-bold-duotone" width={20} color="#0D9488" />
               <div className="mt-2 text-[14.5px] font-bold text-slate-900 leading-snug">{p.title}</div>
               <div className="text-[11px] text-slate-400 mt-1">{p.date}</div>
@@ -28,10 +29,10 @@ export default function InProgressPlans() {
                 </div>
                 <span className="text-[10.5px] font-semibold text-slate-400">{p.progress}%</span>
               </div>
-              <button className="mt-3 w-full py-2 rounded-lg text-[12px] font-semibold text-brand-dark bg-brand-light hover:bg-teal-100 transition-all">
+              <Button variant="light" className="mt-3 w-full py-2 rounded-lg text-[12px] font-semibold">
                 이어하기
-              </button>
-            </div>
+              </Button>
+            </Card>
           ))}
         </div>
 
@@ -39,6 +40,6 @@ export default function InProgressPlans() {
           <Icon icon="solar:alt-arrow-right-linear" width={16} color="#64748B" />
         </button>
       </div>
-    </section>
+    </Section>
   )
 }

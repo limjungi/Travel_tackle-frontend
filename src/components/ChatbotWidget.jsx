@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
+import IconBadge from './ui/IconBadge'
+import Button from './ui/Button'
 
 const INITIAL_MESSAGES = [
   { from: 'bot', text: '안녕하세요! 트레블봇이에요 😊 여행 계획 짜는 거 도와드릴까요?' },
@@ -56,26 +58,27 @@ export default function ChatbotWidget() {
         {/* Soft blurred contact shadow, for the floating feel */}
         <div className="absolute -bottom-4 left-6 right-6 h-9 bg-slate-900/25 blur-2xl rounded-full -z-10" />
 
-        <div className="w-[300px] h-[480px] bg-white rounded-[28px] ring-1 ring-black/5 shadow-[0_30px_70px_rgba(15,23,42,0.28)] overflow-hidden flex flex-col">
+        <div className="w-[300px] h-[480px] bg-white rounded-[28px] ring-1 ring-black/5 shadow-popup overflow-hidden flex flex-col">
           {/* Header */}
           <div className="shrink-0 bg-brand pt-5 pb-3 px-4 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <IconBadge className="w-8 h-8 rounded-full bg-white/20 shrink-0">
               <Icon icon="solar:chat-round-dots-bold" width={16} color="white" />
-            </div>
+            </IconBadge>
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-bold text-white leading-tight">트레블봇</div>
-              <div className="flex items-center gap-1 text-[10.5px] text-teal-50/90">
+              <div className="flex items-center gap-1 text-[10.5px] text-blue-50/90">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-300" />
                 온라인
               </div>
             </div>
-            <button
+            <IconBadge
+              as="button"
               onClick={() => setOpen(false)}
-              className="w-7 h-7 flex items-center justify-center rounded-full text-white/80 hover:bg-white/10 transition-all shrink-0"
+              className="w-7 h-7 rounded-full text-white/80 hover:bg-white/10 transition-all shrink-0"
               aria-label="챗봇 닫기"
             >
               <Icon icon="solar:close-circle-linear" width={18} />
-            </button>
+            </IconBadge>
           </div>
 
           {/* Messages */}
@@ -83,9 +86,9 @@ export default function ChatbotWidget() {
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {m.from === 'bot' && (
-                  <div className="w-6 h-6 rounded-full bg-brand-light flex items-center justify-center shrink-0 mr-1.5 mt-auto">
-                    <Icon icon="solar:chat-round-dots-bold" width={12} color="#0D9488" />
-                  </div>
+                  <IconBadge className="w-6 h-6 rounded-full bg-brand-light shrink-0 mr-1.5 mt-auto">
+                    <Icon icon="solar:chat-round-dots-bold" width={12} color="#2563EB" />
+                  </IconBadge>
                 )}
                 <div
                   className={`max-w-[76%] px-3 py-2 text-[12.5px] leading-snug ${
@@ -110,27 +113,27 @@ export default function ChatbotWidget() {
               placeholder="메시지를 입력하세요..."
               className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-full px-3.5 py-2 text-[12.5px] outline-none focus:border-brand/40 transition-all"
             />
-            <button
+            <Button
               onClick={handleSend}
-              className="w-8 h-8 rounded-full bg-brand flex items-center justify-center shrink-0 hover:bg-brand-dark transition-all"
+              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
               aria-label="전송"
             >
               <Icon icon="solar:plain-2-bold" width={14} color="white" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Floating action button */}
-      <button
+      <Button
         onClick={() => setOpen((v) => !v)}
-        className={`w-14 h-14 rounded-full bg-brand border-[3px] border-white shadow-[0_16px_36px_rgba(13,148,136,0.45)] flex items-center justify-center text-white hover:bg-brand-dark transition-all hover:scale-105 hover:shadow-[0_20px_44px_rgba(13,148,136,0.55)] ${
+        className={`w-14 h-14 rounded-full border-[3px] border-white shadow-float flex items-center justify-center hover:scale-105 hover:shadow-float-hover ${
           open ? '' : 'animate-float'
         }`}
         aria-label={open ? '챗봇 닫기' : '챗봇 열기'}
       >
         <Icon icon={open ? 'solar:close-circle-bold' : 'solar:chat-round-dots-bold'} width={24} />
-      </button>
+      </Button>
     </div>
   )
 }

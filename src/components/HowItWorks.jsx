@@ -1,4 +1,8 @@
 import { Icon } from '@iconify/react'
+import Section from './ui/Section'
+import Card from './ui/Card'
+import IconBadge from './ui/IconBadge'
+import Chip from './ui/Chip'
 
 const steps = [
   {
@@ -24,10 +28,10 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section className="bg-[#EFFBF9] py-16">
-      <div className="max-w-[1180px] mx-auto px-6 text-center">
-        <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold text-brand-dark bg-white border border-brand/20">
+      <Section as="div" className="text-center">
+        <Chip className="inline-block px-3 py-1 text-[11px] font-bold text-brand-dark bg-white border border-brand/20">
           HOW IT WORKS
-        </span>
+        </Chip>
         <h2 className="mt-4 text-[26px] font-extrabold tracking-tight text-slate-900">
           세 단계, 현지인이 봐주는 일정 완성
         </h2>
@@ -37,19 +41,19 @@ export default function HowItWorks() {
 
         <div className="mt-10 grid md:grid-cols-3 gap-5">
           {steps.map((s) => (
-            <div key={s.num} className="lift bg-white border border-slate-100 rounded-2xl p-6 text-left">
+            <Card key={s.num} className="p-6 text-left">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center">
+                <IconBadge className="w-11 h-11 rounded-xl bg-brand-light">
                   <Icon icon={s.icon} width={22} color="#0D9488" />
-                </div>
+                </IconBadge>
                 <span className="text-[22px] font-extrabold text-slate-200">{s.num}</span>
               </div>
               <div className="mt-4 text-[15px] font-bold text-slate-900">{s.title}</div>
               <p className="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">{s.desc}</p>
-            </div>
+            </Card>
           ))}
         </div>
-      </div>
+      </Section>
     </section>
   )
 }
