@@ -66,7 +66,7 @@ export default function ChatbotWidget() {
             </IconBadge>
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-bold text-white leading-tight">트레블봇</div>
-              <div className="flex items-center gap-1 text-[10.5px] text-teal-50/90">
+              <div className="flex items-center gap-1 text-[10.5px] text-blue-50/90">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-300" />
                 온라인
               </div>
@@ -87,7 +87,7 @@ export default function ChatbotWidget() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {m.from === 'bot' && (
                   <IconBadge className="w-6 h-6 rounded-full bg-brand-light shrink-0 mr-1.5 mt-auto">
-                    <Icon icon="solar:chat-round-dots-bold" width={12} color="#0D9488" />
+                    <Icon icon="solar:chat-round-dots-bold" width={12} color="#2563EB" />
                   </IconBadge>
                 )}
                 <div

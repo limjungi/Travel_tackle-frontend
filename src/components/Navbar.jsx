@@ -1,99 +1,125 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
 import { Link } from 'react-router-dom'
-import Section from './ui/Section'
-import IconBadge from './ui/IconBadge'
-import Button from './ui/Button'
 import { useAuth } from '../context/AuthContext'
 import logoHorizontal from '../assets/logo-horizontal.svg'
 
-const navLinks = [
-  { label: '탐색', active: true },
-  { label: '계획' },
-  { label: '피드' },
-  { label: '기록' },
-  { label: '마이페이지' },
+const NAV = [
+  { label: '여행지 탐색', href: '/#explore' },
+  { label: '여행자 피드', href: '/#community', caret: true },
+  { label: '나의 여행', href: '/#participate', caret: true },
 ]
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user } = useAuth()
+  const [profileOpen, setProfileOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const profileRef = useRef(null)
+
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', onClickOutside)
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [])
+
+  async function handleLogout() {
+    try { await logout() } catch { /* 무시 */ }
+    setProfileOpen(false)
+  }
 
   return (
-    <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-100">
-      <Section as="div" padding="px-4 sm:px-6" className="flex items-center gap-6 h-16">
-        <Link to="/" className="flex items-center shrink-0">
-          <img src={logoHorizontal} alt="트레블 참견" className="h-[35px] w-auto" />
+    <nav className="sticky top-0 z-40 border-b border-slate-200/70 bg-[#F4F7FA]/95 backdrop-blur">
+      <div className="relative max-w-[1200px] mx-auto flex items-center gap-5 px-4 sm:px-6 h-16">
+        <Link to="/" className="flex items-center shrink-0" aria-label="트레블 참견 홈">
+          <img src={logoHorizontal} alt="트레블 참견" className="h-8 sm:h-9 w-auto" />
         </Link>
 
-        {/* Desktop nav links */}
-        <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((l) => (
+        <div className="absolute left-1/2 hidden -translate-x-1/2 md:flex items-center gap-2">
+          {NAV.map((n) => (
             <a
-              key={l.label}
-              href="#"
-              className={`px-3.5 py-2 rounded-lg text-[13.5px] transition-all whitespace-nowrap ${
-                l.active
-                  ? 'font-semibold text-slate-800 hover:bg-slate-50'
-                  : 'font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-              }`}
+              key={n.label}
+              href={n.href}
+              className="flex items-center gap-1 rounded-[10px] bg-[#78A9EB] px-4 py-1.5 text-[12px] font-bold text-white hover:bg-[#6699E5] transition-colors whitespace-nowrap"
             >
-              {l.label}
+              {n.label}
+              {n.caret && <Icon icon="solar:alt-arrow-down-linear" width={12} />}
             </a>
           ))}
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
-          {user ? (
-            <>
-              <IconBadge as="button" className="relative w-9 h-9 rounded-full text-slate-400 hover:bg-slate-50 transition-all shrink-0">
-                <Icon icon="solar:bell-linear" width={19} />
-                <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500" />
-              </IconBadge>
-
-              <button className="flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border border-slate-200 hover:border-slate-300 transition-all shrink-0">
-                <IconBadge className="w-7 h-7 rounded-full bg-brand-light shrink-0">
-                  <Icon icon="solar:user-bold" width={14} color="#0D9488" />
-                </IconBadge>
-                <span className="text-[12.5px] font-bold text-slate-700">{user.name}</span>
-                <Icon icon="solar:alt-arrow-down-linear" width={12} color="#94A3B8" />
-              </button>
-            </>
-          ) : (
-            <Button
-              as={Link}
-              to="/login"
-              variant="light"
-              className="px-4 py-2 rounded-full text-[13px] font-bold shrink-0"
+        {/* 우측 */}
+        <div className="ml-auto flex items-center gap-3 shrink-0">
+          {user && (
+            <button
+              type="button"
+              className="hidden sm:flex h-[30px] w-[30px] items-center justify-center text-[#78A9EB] hover:text-[#569BF9] transition-colors"
+              aria-label="알림"
             >
-              로그인
-            </Button>
+              <Icon icon="solar:bell-linear" width={21} />
+            </button>
           )}
 
-          {/* Mobile menu toggle */}
-          <IconBadge
-            as="button"
+          <button className="hidden sm:flex h-[30px] items-center gap-1 rounded-[10px] border border-[#78A9EB] bg-white px-3 text-[12px] font-bold text-[#569BF9] hover:bg-blue-50 transition-colors" aria-label="언어 선택">
+            <Icon icon="solar:global-bold" width={16} />
+            <span>KR</span>
+            <Icon icon="solar:alt-arrow-down-linear" width={11} />
+          </button>
+
+          {user ? (
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setProfileOpen((v) => !v)}
+                className="flex h-[30px] items-center gap-1 rounded-[10px] border border-[#78A9EB] bg-white px-3 text-[#569BF9] hover:bg-blue-50 transition-colors"
+                aria-expanded={profileOpen}
+              >
+                <span className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full bg-[#BFD8FA] text-white">
+                  <Icon icon="solar:user-bold" width={9} />
+                </span>
+                <span className="max-w-[96px] truncate text-[12px] font-bold">
+                  {user.name || user.email || '회원'} 님
+                </span>
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-2xl border border-slate-100 shadow-[0_12px_28px_rgba(15,23,42,0.12)] py-1.5 z-50">
+                  <Link to="/mypage" onClick={() => setProfileOpen(false)} className="flex items-center gap-2 px-3.5 py-2 text-[13px] text-slate-600 hover:bg-slate-50 transition-all">
+                    <Icon icon="solar:user-circle-linear" width={16} /> 마이페이지
+                  </Link>
+                  <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3.5 py-2 text-[13px] text-rose-500 hover:bg-rose-50 transition-all">
+                    <Icon icon="solar:logout-2-linear" width={16} /> 로그아웃
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="flex h-[30px] items-center gap-1 rounded-[10px] border border-[#78A9EB] bg-white px-3 text-[12px] font-bold text-[#569BF9] hover:bg-blue-50 transition-colors whitespace-nowrap">
+              <span className="flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#BFD8FA] text-white">
+                <Icon icon="solar:user-bold" width={9} />
+              </span>
+              로그인
+            </Link>
+          )}
+
+          {/* 모바일 메뉴 토글 */}
+          <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="md:hidden w-9 h-9 rounded-full text-slate-500 hover:bg-slate-50 transition-all shrink-0"
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-white/60 transition-all"
             aria-label="메뉴 열기"
+            aria-expanded={menuOpen}
           >
             <Icon icon={menuOpen ? 'solar:close-circle-linear' : 'solar:hamburger-menu-linear'} width={20} />
-          </IconBadge>
+          </button>
         </div>
-      </Section>
+      </div>
 
-      {/* Mobile dropdown menu */}
+      {/* 모바일 드롭다운 */}
       {menuOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-2">
-          {navLinks.map((l) => (
-            <a
-              key={l.label}
-              href="#"
-              className={`block px-2 py-2.5 rounded-lg text-[14px] transition-all ${
-                l.active ? 'font-semibold text-slate-800' : 'font-medium text-slate-500'
-              }`}
-            >
-              {l.label}
+        <div className="md:hidden bg-white border-t border-slate-100 px-4 py-3 flex flex-col">
+          {NAV.map((n) => (
+            <a key={n.label} href={n.href} onClick={() => setMenuOpen(false)} className="text-slate-700 font-semibold text-[14px] rounded-lg px-3 py-3 hover:bg-slate-50">
+              {n.label}
             </a>
           ))}
         </div>

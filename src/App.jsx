@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import OAuthCallback from './pages/OAuthCallback'
 import WelcomePage from './pages/onboarding/WelcomePage'
 import PreferenceWizard from './pages/onboarding/PreferenceWizard'
 import CompletePage from './pages/onboarding/CompletePage'
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/oauth/callback" element={<OAuthCallback />} />
           <Route
             path="/onboarding/welcome"
             element={

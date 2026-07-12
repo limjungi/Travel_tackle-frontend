@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import * as authApi from '../api/auth'
 
 const RESEND_COOLDOWN = 60
+const CODE_EXPIRE_SECONDS = 90 // 인증번호 유효시간 1분 30초
 const inputClass =
   'w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-[14px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-brand transition-all disabled:bg-slate-50 disabled:text-slate-400'
 
@@ -23,6 +24,7 @@ export default function SignupPage() {
   const [code, setCode] = useState('')
   const [codeVerified, setCodeVerified] = useState(false)
   const [cooldown, setCooldown] = useState(0)
+  const [expiresIn, setExpiresIn] = useState(0) // 인증번호 만료까지 남은 초
 
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
@@ -37,6 +39,7 @@ export default function SignupPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const timerRef = useRef(null)
+  const expireRef = useRef(null)
 
   useEffect(() => {
     if (cooldown <= 0) {
@@ -47,13 +50,29 @@ export default function SignupPage() {
     return () => clearInterval(timerRef.current)
   }, [cooldown])
 
+  // 인증번호 만료 카운트다운
+  useEffect(() => {
+    if (expiresIn <= 0) {
+      clearInterval(expireRef.current)
+      return
+    }
+    expireRef.current = setInterval(() => setExpiresIn((s) => s - 1), 1000)
+    return () => clearInterval(expireRef.current)
+  }, [expiresIn])
+
+  const expired = codeSent && !codeVerified && expiresIn <= 0
+  const mmss = `${String(Math.floor(expiresIn / 60)).padStart(2, '0')}:${String(expiresIn % 60).padStart(2, '0')}`
+
   const handleSendCode = async () => {
     setEmailError('')
     setSendingCode(true)
     try {
       await authApi.requestEmailCode(email)
       setCodeSent(true)
+      setCode('')
+      setCodeError('')
       setCooldown(RESEND_COOLDOWN)
+      setExpiresIn(CODE_EXPIRE_SECONDS)
     } catch (err) {
       if (err.response?.status === 429) {
         setEmailError('요청이 너무 많아요. 잠시 후 다시 시도해주세요.')
@@ -68,11 +87,16 @@ export default function SignupPage() {
   }
 
   const handleVerifyCode = async () => {
+    if (expiresIn <= 0) {
+      setCodeError('인증번호가 만료됐어요. 코드를 재전송해주세요.')
+      return
+    }
     setCodeError('')
     setVerifyingCode(true)
     try {
       await authApi.confirmEmailCode(email, code)
       setCodeVerified(true)
+      setExpiresIn(0)
       setStep('info')
     } catch {
       setCodeError('인증번호가 올바르지 않거나 만료됐어요.')
@@ -83,10 +107,12 @@ export default function SignupPage() {
 
   const handleChangeEmail = () => {
     clearInterval(timerRef.current)
+    clearInterval(expireRef.current)
     setCodeSent(false)
     setCodeVerified(false)
     setCode('')
     setCooldown(0)
+    setExpiresIn(0)
     setCodeError('')
     setStep('email')
   }
@@ -147,10 +173,10 @@ export default function SignupPage() {
                   {cooldown > 0
                     ? `재전송 (${cooldown}초)`
                     : codeSent
-                      ? '코드 재전송'
+                      ? '인증 재전송'
                       : sendingCode
                         ? '전송 중...'
-                        : '코드 받기'}
+                        : '인증 받기'}
                 </Button>
               </div>
               {emailError && <p className="mt-1.5 text-[12px] text-rose-500">{emailError}</p>}
@@ -158,7 +184,14 @@ export default function SignupPage() {
 
             {codeSent && (
               <div>
-                <span className="block text-[13px] font-semibold text-slate-600 mb-1.5">인증번호</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[13px] font-semibold text-slate-600">인증번호</span>
+                  {!codeVerified && (
+                    <span className={`text-[12px] font-semibold ${expired ? 'text-rose-500' : 'text-brand-dark'}`}>
+                      {expired ? '만료됨' : `${mmss} 남음`}
+                    </span>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <input
                     inputMode="numeric"
@@ -166,18 +199,22 @@ export default function SignupPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     maxLength={6}
+                    disabled={expired}
                     className={inputClass}
                     required
                   />
                   <Button
                     type="button"
                     onClick={handleVerifyCode}
-                    disabled={code.length !== 6 || verifyingCode}
+                    disabled={code.length !== 6 || verifyingCode || expired}
                     className="shrink-0 h-12 px-5 rounded-xl font-bold text-[13.5px] whitespace-nowrap disabled:opacity-40 disabled:pointer-events-none"
                   >
                     {verifyingCode ? '확인 중...' : '인증 하기'}
                   </Button>
                 </div>
+                {expired && !codeError && (
+                  <p className="mt-1.5 text-[12px] text-rose-500">인증번호가 만료됐어요. 코드를 재전송해주세요.</p>
+                )}
                 {codeError && <p className="mt-1.5 text-[12px] text-rose-500">{codeError}</p>}
               </div>
             )}
