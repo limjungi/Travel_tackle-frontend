@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import logoHorizontal from '../assets/logo-horizontal.svg'
 
 const NAV = [
-  { label: '여행지 탐색', href: '/#explore' },
+  { label: '여행지 탐색', to: '/explore' },
   { label: '여행자 피드', href: '/#community', caret: true },
   { label: '나의 여행', href: '/#participate', caret: true },
 ]
@@ -15,6 +15,7 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false)
   const { user, logout } = useAuth()
   const profileRef = useRef(null)
+  const location = useLocation()
 
   useEffect(() => {
     function onClickOutside(e) {
@@ -37,16 +38,22 @@ export default function Navbar() {
         </Link>
 
         <div className="absolute left-1/2 hidden -translate-x-1/2 md:flex items-center gap-2">
-          {NAV.map((n) => (
-            <a
-              key={n.label}
-              href={n.href}
-              className="flex items-center gap-1 rounded-[10px] bg-[#78A9EB] px-4 py-1.5 text-[12px] font-bold text-white hover:bg-[#6699E5] transition-colors whitespace-nowrap"
-            >
-              {n.label}
-              {n.caret && <Icon icon="solar:alt-arrow-down-linear" width={12} />}
-            </a>
-          ))}
+          {NAV.map((n) => {
+            const active = n.to && location.pathname === n.to
+            const className = `flex items-center gap-1 rounded-[10px] px-4 py-1.5 text-[12px] font-bold text-white transition-colors whitespace-nowrap ${
+              active ? 'bg-brand hover:bg-brand-dark' : 'bg-[#78A9EB] hover:bg-[#6699E5]'
+            }`
+            return n.to ? (
+              <Link key={n.label} to={n.to} className={className}>
+                {n.label}
+              </Link>
+            ) : (
+              <a key={n.label} href={n.href} className={className}>
+                {n.label}
+                {n.caret && <Icon icon="solar:alt-arrow-down-linear" width={12} />}
+              </a>
+            )
+          })}
         </div>
 
         {/* 우측 */}
@@ -117,11 +124,19 @@ export default function Navbar() {
       {/* 모바일 드롭다운 */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-slate-100 px-4 py-3 flex flex-col">
-          {NAV.map((n) => (
-            <a key={n.label} href={n.href} onClick={() => setMenuOpen(false)} className="text-slate-700 font-semibold text-[14px] rounded-lg px-3 py-3 hover:bg-slate-50">
-              {n.label}
-            </a>
-          ))}
+          {NAV.map((n) => {
+            const active = n.to && location.pathname === n.to
+            const className = `font-semibold text-[14px] rounded-lg px-3 py-3 hover:bg-slate-50 ${active ? 'text-brand' : 'text-slate-700'}`
+            return n.to ? (
+              <Link key={n.label} to={n.to} onClick={() => setMenuOpen(false)} className={className}>
+                {n.label}
+              </Link>
+            ) : (
+              <a key={n.label} href={n.href} onClick={() => setMenuOpen(false)} className={className}>
+                {n.label}
+              </a>
+            )
+          })}
         </div>
       )}
     </nav>

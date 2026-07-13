@@ -53,7 +53,7 @@ export default function ExploreSection() {
 
   return (
     <Section as="section" id="explore" className="py-14 sm:py-16">
-      <h2 className="text-[22px] font-medium text-slate-900">좋은 여행은 좋은 참견에서 시작됩니다.</h2>
+      <h2 className="text-[22px] font-bold text-slate-900">좋은 여행은 <span className="text-brand font-extrabold">좋은 참견</span>에서 시작됩니다.</h2>
 
       {/* 주요 콘텐츠 탭 — 전체 너비에 균등 배치 */}
       <div className="mt-6 grid grid-cols-3 border-b border-slate-100">

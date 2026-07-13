@@ -18,7 +18,7 @@ export default function ParticipateSection() {
   return (
     <Section as="section" id="participate" className="py-14 sm:py-16">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-[22px] font-bold text-slate-900">다른 여행자의 계획에 직접 참견해보세요</h2>
+        <h2 className="text-[22px] font-bold text-slate-900">다른 여행자의 계획에 직접 <span className="text-brand font-extrabold">참견</span>해보세요</h2>
         <button className="shrink-0 flex items-center gap-1.5 bg-white border border-slate-200 rounded-full px-3.5 py-2 text-[12px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
           <Icon icon="solar:refresh-linear" width={14} /> 다른 계획 보기
         </button>
