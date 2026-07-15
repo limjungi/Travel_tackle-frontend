@@ -111,12 +111,14 @@ export default function PreferenceWizard() {
 
   return (
     <OnboardingHeader>
-      <div className="max-w-[560px] mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-[22px] sm:text-[26px] leading-[1.25] font-extrabold tracking-tight text-slate-900">
-            {user?.name}님의 여행 취향을 알려주세요 ✈️
+      {/* flex-1 + 질문 영역 flex-1: 스텝별 옵션 수가 달라도 헤더·진행바·버튼 위치가 고정된다 */}
+      <div className="mx-auto flex w-full max-w-[580px] flex-1 flex-col">
+        <div className="mb-7">
+          <p className="text-[13px] font-bold text-brand">나만의 여행 취향 설정</p>
+          <h1 className="mt-1.5 text-[22px] sm:text-[26px] leading-[1.25] font-extrabold tracking-tight text-slate-900">
+            {user?.name}님의 여행 취향을 알려주세요
           </h1>
-          <p className="text-[13.5px] text-slate-500 mt-2">더 정확한 여행 추천을 위해 필요해요</p>
+          <p className="text-[14px] text-slate-500 mt-2">더 정확한 참견과 추천을 위해 필요해요</p>
         </div>
 
         <div className="flex items-center justify-between mb-2">
@@ -126,9 +128,9 @@ export default function PreferenceWizard() {
           <button
             type="button"
             onClick={handleSkip}
-            className="text-[12px] font-medium text-slate-300 hover:text-slate-500 transition-all"
+            className="text-[13px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
           >
-            skip
+            건너뛰기
           </button>
         </div>
         <div className="h-1.5 w-full rounded-full bg-slate-100 mb-5 overflow-hidden">
@@ -138,7 +140,7 @@ export default function PreferenceWizard() {
           />
         </div>
 
-        <div className="bg-slate-50 rounded-2xl p-5 sm:p-6">
+        <div className="flex-1 bg-slate-50 rounded-2xl p-4 sm:p-5">
           <div className="text-center mb-5">
             <h2 className="text-[17px] sm:text-[19px] font-bold text-slate-800">
               Q{stepIndex + 1}. {step.title}
@@ -163,13 +165,13 @@ export default function PreferenceWizard() {
         {error && <p className="text-[12px] text-rose-500 text-center mt-4">{error}</p>}
 
         <div className="flex items-center justify-between mt-5">
-          <Button variant="light" onClick={handlePrev} className="h-10 px-5 rounded-xl font-bold text-[13px]">
+          <Button variant="light" onClick={handlePrev} className="h-11 px-6 rounded-xl font-bold text-[14px]">
             이전
           </Button>
           <Button
             onClick={handleNext}
             disabled={!isAnswered || submitting}
-            className="h-10 px-5 rounded-xl font-bold text-[13px] disabled:opacity-40"
+            className="h-11 px-6 rounded-xl font-bold text-[14px] disabled:opacity-40"
           >
             {submitting ? '저장 중...' : stepIndex === STEPS.length - 1 ? '완료' : '다음'}
           </Button>

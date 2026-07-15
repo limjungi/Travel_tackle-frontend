@@ -6,13 +6,21 @@ export default function OptionCard({ option, selected, multiple, onClick }) {
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`w-full flex items-center gap-2.5 rounded-xl border-2 px-4 py-3 text-left transition-all ${
+      className={`w-full flex items-center gap-2 rounded-xl border-2 px-3 py-3 text-left transition-all ${
         selected ? 'border-brand bg-brand-light' : 'border-slate-100 bg-slate-50 hover:border-slate-200'
       }`}
     >
-      <span className="text-[20px] leading-none shrink-0">{option.icon}</span>
+      {option.icon && (
+        <span
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+            selected ? 'bg-white text-brand' : 'bg-white text-slate-400 ring-1 ring-slate-100'
+          }`}
+        >
+          <Icon icon={option.icon} width={16} />
+        </span>
+      )}
       <span className="flex-1 min-w-0">
-        <span className={`block text-[14px] font-bold ${selected ? 'text-brand-dark' : 'text-slate-800'}`}>
+        <span className={`block whitespace-nowrap text-[14px] font-bold ${selected ? 'text-brand-dark' : 'text-slate-800'}`}>
           {option.label}
         </span>
         {option.description && (
