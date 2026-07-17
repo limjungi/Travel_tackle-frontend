@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showReset, setShowReset] = useState(false)
+  const [appleNotice, setAppleNotice] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -103,6 +104,21 @@ export default function LoginPage() {
           <Icon icon="logos:google-icon" width={17} />
           Google로 계속하기
         </a>
+        {/* Apple 로그인은 Apple Developer 등록 전이라 미도입 — 클릭 시 준비 중 안내만 표시 */}
+        <button
+          type="button"
+          onClick={() => setAppleNotice(true)}
+          aria-describedby={appleNotice ? 'apple-login-notice' : undefined}
+          className="h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-[14px] bg-black text-white hover:bg-slate-800 transition-all"
+        >
+          <Icon icon="ri:apple-fill" width={19} />
+          Apple로 계속하기
+        </button>
+        {appleNotice && (
+          <p id="apple-login-notice" role="status" className="text-center text-[12.5px] text-slate-500">
+            Apple 로그인은 아직 준비 중이에요. 카카오 또는 Google로 로그인해주세요.
+          </p>
+        )}
       </div>
 
       <p className="text-center text-[13px] text-slate-500 mt-7">
