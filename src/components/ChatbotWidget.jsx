@@ -2,25 +2,25 @@ import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
 import IconBadge from './ui/IconBadge'
 import Button from './ui/Button'
+import { sendChatMessage } from '../api/chat'
+import { useLanguage } from '../i18n'
 
-const INITIAL_MESSAGES = [
-  { from: 'bot', text: '안녕하세요! 트레블봇이에요 😊 여행 계획 짜는 거 도와드릴까요?' },
-  { from: 'user', text: '네! 이번 주말에 갈만한 근교 여행지 추천해주세요' },
-  { from: 'bot', text: '좋아요! 강릉이나 속초 쪽 바다 여행 어떠세요? 당일치기로도 좋아요 🌊' },
-]
+const GREETING = { from: 'bot', text: '안녕하세요! 트레블봇이에요 😊 여행 계획 짜는 거 도와드릴까요?' }
 
-const CANNED_REPLIES = [
-  '네, 어떤 여행지를 찾고 계세요?',
-  '제주도, 부산, 강릉 중에 관심 있는 곳 있으세요?',
-  '원하시는 예산이나 기간을 알려주시면 코스를 추천해드릴게요!',
-  '좋아요! 관련된 인기 계획도 같이 찾아볼게요.',
-]
+function createConversationId() {
+  return globalThis.crypto?.randomUUID?.() || `chat-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
 
 export default function ChatbotWidget() {
+  // UI 문구는 한국어 고정 — 선택 언어는 챗봇 답변 언어(API language 파라미터)에만 쓴다
+  const { language } = useLanguage()
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState(INITIAL_MESSAGES)
+  const [messages, setMessages] = useState([GREETING])
   const [input, setInput] = useState('')
-  const replyIndex = useRef(0)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
+  const conversationId = useRef(createConversationId())
+  const abortRef = useRef(null)
   const scrollRef = useRef(null)
 
   useEffect(() => {
@@ -29,22 +29,54 @@ export default function ChatbotWidget() {
     }
   }, [messages, open])
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = input.trim()
-    if (!text) return
+    if (!text || sending) return
 
     setMessages((prev) => [...prev, { from: 'user', text }])
     setInput('')
+    setError('')
+    setSending(true)
 
-    const reply = CANNED_REPLIES[replyIndex.current % CANNED_REPLIES.length]
-    replyIndex.current += 1
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { from: 'bot', text: reply }])
-    }, 600)
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    try {
+      const response = await sendChatMessage(
+        {
+          message: text,
+          conversationId: conversationId.current,
+          language,
+        },
+        { signal: controller.signal }
+      )
+      setMessages((prev) => [...prev, { from: 'bot', text: response.reply }])
+    } catch (err) {
+      // 새 대화로 넘어가며 중단된 요청 — 새 대화 상태를 건드리지 않는다.
+      if (controller.signal.aborted) return
+      if (err.response?.status === 401) {
+        setError('로그인 후 트레블봇을 이용할 수 있어요.')
+      } else if (err.response?.status === 429) {
+        setError('요청이 많아요. 잠시 후 다시 시도해주세요.')
+      } else {
+        setError('답변을 불러오지 못했어요. 잠시 후 다시 시도해주세요.')
+      }
+    } finally {
+      if (!controller.signal.aborted) setSending(false)
+    }
   }
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleSend()
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing) handleSend()
+  }
+
+  const handleNewConversation = () => {
+    abortRef.current?.abort()
+    conversationId.current = createConversationId()
+    setMessages([GREETING])
+    setInput('')
+    setError('')
+    setSending(false)
   }
 
   return (
@@ -73,6 +105,14 @@ export default function ChatbotWidget() {
             </div>
             <IconBadge
               as="button"
+              onClick={handleNewConversation}
+              className="w-7 h-7 rounded-full text-white/80 hover:bg-white/10 transition-all shrink-0"
+              aria-label="새 대화"
+            >
+              <Icon icon="solar:restart-linear" width={17} />
+            </IconBadge>
+            <IconBadge
+              as="button"
               onClick={() => setOpen(false)}
               className="w-7 h-7 rounded-full text-white/80 hover:bg-white/10 transition-all shrink-0"
               aria-label="챗봇 닫기"
@@ -91,7 +131,7 @@ export default function ChatbotWidget() {
                   </IconBadge>
                 )}
                 <div
-                  className={`max-w-[76%] px-3 py-2 text-[12.5px] leading-snug ${
+                  className={`max-w-[76%] whitespace-pre-wrap px-3 py-2 text-[12.5px] leading-snug ${
                     m.from === 'user'
                       ? 'bg-brand text-white rounded-2xl rounded-tr-sm'
                       : 'bg-white border border-slate-100 text-slate-700 rounded-2xl rounded-tl-sm'
@@ -101,25 +141,42 @@ export default function ChatbotWidget() {
                 </div>
               </div>
             ))}
+            {sending && (
+              <div className="flex justify-start" aria-label="답변 작성 중">
+                <IconBadge className="w-6 h-6 rounded-full bg-brand-light shrink-0 mr-1.5 mt-auto">
+                  <Icon icon="solar:chat-round-dots-bold" width={12} color="#2563EB" />
+                </IconBadge>
+                <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border border-slate-100 bg-white px-3 py-3">
+                  {[0, 1, 2].map((dot) => (
+                    <span key={dot} className="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-300" style={{ animationDelay: `${dot * 140}ms` }} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Composer */}
-          <div className="shrink-0 border-t border-slate-100 p-2.5 flex items-center gap-2 bg-white">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="메시지를 입력하세요..."
-              className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-full px-3.5 py-2 text-[12.5px] outline-none focus:border-brand/40 transition-all"
-            />
-            <Button
-              onClick={handleSend}
-              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-              aria-label="전송"
-            >
-              <Icon icon="solar:plain-2-bold" width={14} color="white" />
-            </Button>
+          <div className="shrink-0 border-t border-slate-100 bg-white p-2.5">
+            {error && <p className="mb-2 px-1 text-[11px] text-rose-500" role="alert">{error}</p>}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="메시지를 입력하세요..."
+                disabled={sending}
+                className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-full px-3.5 py-2 text-[12.5px] outline-none focus:border-brand/40 transition-all disabled:opacity-60"
+              />
+              <Button
+                onClick={handleSend}
+                disabled={sending || !input.trim()}
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="전송"
+              >
+                <Icon icon="solar:plain-2-bold" width={14} color="white" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

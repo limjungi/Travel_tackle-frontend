@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import * as authApi from '../api/auth'
 
 const RESEND_COOLDOWN = 60
-const CODE_EXPIRE_SECONDS = 90 // 인증번호 유효시간 1분 30초
+const CODE_EXPIRE_SECONDS = 600 // 백엔드 email-verification-expiration-minutes(10분)와 일치
 const inputClass =
   'w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-[14px] text-slate-900 placeholder:text-slate-400 outline-none focus:border-brand transition-all disabled:bg-slate-50 disabled:text-slate-400'
 

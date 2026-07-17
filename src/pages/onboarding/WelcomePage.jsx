@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { Icon } from '@iconify/react'
 import OnboardingHeader from '../../components/onboarding/OnboardingHeader'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../context/AuthContext'
@@ -10,23 +11,36 @@ export default function WelcomePage() {
 
   return (
     <OnboardingHeader>
-      <div className="flex flex-col items-center text-center py-16 sm:py-24">
-        <img src={logoIcon} alt="" className="w-28 h-28 sm:w-32 sm:h-32 mb-9 animate-float" />
-        <p className="text-[16px] font-bold text-brand-dark mb-2">환영해요</p>
-        <h1 className="text-[36px] sm:text-[44px] leading-[1.2] font-extrabold tracking-tight text-slate-900 mb-4">
-          반가워요 {user?.name}님!
+      <div className="mx-auto flex min-h-[500px] w-full max-w-[460px] flex-col items-center justify-center text-center">
+        <img src={logoIcon} alt="" className="h-20 w-20 sm:h-24 sm:w-24" />
+
+        <p className="mt-7 text-[13px] font-bold text-brand">환영해요</p>
+        <h1 className="mt-2 text-[32px] font-extrabold leading-[1.2] tracking-tight text-slate-900 sm:text-[36px]">
+          반가워요, {user?.name}님!
         </h1>
-        <p className="text-[17px] sm:text-[18px] text-slate-500 leading-relaxed mb-12">
-          나에게 맞는 여행을 위한
+        <p className="mt-4 text-[15px] leading-relaxed text-slate-500">
+          내 취향을 알려주면
           <br />
-          간단한 취향 설정을 시작해볼까요?
+          참견이 훨씬 정확해져요.
         </p>
+
         <Button
           onClick={() => navigate('/onboarding/preferences')}
-          className="h-14 px-12 rounded-xl font-bold text-[17px]"
+          className="mt-9 h-12 w-full max-w-[330px] rounded-xl text-[15px] font-bold"
         >
-          시작하기
+          취향 설정 시작하기
         </Button>
+        <p className="mt-3 flex items-center gap-1 text-[12px] text-slate-400">
+          <Icon icon="solar:clock-circle-linear" width={13} /> 약 1분 · 질문 4개
+        </p>
+
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="mt-7 text-[13px] font-medium text-slate-400 transition-colors hover:text-slate-600"
+        >
+          나중에 할게요
+        </button>
       </div>
     </OnboardingHeader>
   )
