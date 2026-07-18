@@ -7,7 +7,7 @@ import logoHorizontal from '../assets/logo-horizontal.svg'
 
 const NAV = [
   { label: '여행지 탐색', to: '/explore' },
-  { label: '여행자 피드', href: '/#community', caret: true },
+  { label: '여행자 피드', to: '/feed' },
   { label: '나의 여행', href: '/#participate', caret: true },
 ]
 
