@@ -9,6 +9,27 @@ function areaName(code) {
   return FALLBACK_AREAS.find((a) => a.code === String(code))?.name ?? ''
 }
 
+// 테마 구분은 TourAPI contentTypeId 기준 (탐색 탭과 동일 체계). 아이콘은 탐색 사이드바(tourSpots THEMES)와 통일.
+// 역사/문화(14)·여행코스(25)·타입 미상은 관광지로, 카페는 맛집과 같은 39라 맛집에 포함.
+const CART_THEMES = [
+  { key: 'activity', label: '액티비티', typeIds: ['28'], icon: 'mdi:run-fast' },
+  { key: 'spot', label: '관광지', typeIds: ['12', '14', '25'], icon: 'mdi:map-marker-outline' },
+  { key: 'shopping', label: '쇼핑', typeIds: ['38'], icon: 'mdi:shopping-outline' },
+  { key: 'food', label: '맛집', typeIds: ['39'], icon: 'mdi:silverware-fork-knife' },
+  { key: 'festival', label: '축제/행사', typeIds: ['15'], icon: 'mdi:party-popper' },
+  { key: 'stay', label: '숙박', typeIds: ['32'], icon: 'mdi:bed' },
+]
+
+const CART_TABS = [{ key: 'all', label: '전체' }, ...CART_THEMES]
+
+function cartTheme(contentTypeId) {
+  return CART_THEMES.find((t) => t.typeIds.includes(String(contentTypeId))) ?? CART_THEMES.find((t) => t.key === 'spot')
+}
+
+function themeKey(contentTypeId) {
+  return cartTheme(contentTypeId).key
+}
+
 function isSpotDrag(e) {
   return e.dataTransfer?.types?.includes(SPOT_DRAG_TYPE)
 }
@@ -23,6 +44,7 @@ export default function FloatingCart() {
   const [dragActive, setDragActive] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [justAddedId, setJustAddedId] = useState(null)
+  const [tab, setTab] = useState('all')
   const [notice, setNotice] = useState('')
   const noticeTimer = useRef(null)
   const highlightTimer = useRef(null)
@@ -122,6 +144,7 @@ export default function FloatingCart() {
     }
     try {
       await addCartItem(spot.contentId) // 성공 시 cart:changed 신호로 목록·배지 갱신
+      setTab('all') // 다른 테마 탭이 선택돼 있어도 방금 담은 항목이 보이게
       setJustAddedId(spot.contentId)
       clearTimeout(highlightTimer.current)
       highlightTimer.current = setTimeout(() => setJustAddedId(null), 2000)
@@ -146,6 +169,8 @@ export default function FloatingCart() {
     onDragLeave: handleDragLeave,
     onDrop: handleDrop,
   }
+
+  const visibleItems = tab === 'all' ? items : items.filter((i) => themeKey(i.contentTypeId) === tab)
 
   return (
     // 루트는 pointer-events-none — 닫힌 패널의 투명 영역이 클릭을 가로채지 않게
@@ -180,6 +205,24 @@ export default function FloatingCart() {
             </button>
           </div>
 
+          {user && (
+            <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-slate-100 px-3 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {CART_TABS.map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-[12px] font-bold transition-all ${
+                    tab === t.key
+                      ? 'border-brand bg-brand text-white'
+                      : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto p-3">
             {!user ? (
               <div className="flex h-full flex-col items-center justify-center text-center">
@@ -199,15 +242,19 @@ export default function FloatingCart() {
                   <div key={i} className="h-[76px] animate-pulse rounded-2xl border border-slate-100 bg-slate-50" />
                 ))}
               </div>
-            ) : items.length === 0 ? (
+            ) : visibleItems.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center text-center">
                 <Icon icon="solar:map-point-linear" width={30} className="mx-auto text-slate-300" />
-                <p className="mt-3 text-[13px] font-semibold text-slate-600">아직 담은 장소가 없어요</p>
+                <p className="mt-3 text-[13px] font-semibold text-slate-600">
+                  {items.length === 0
+                    ? '아직 담은 장소가 없어요'
+                    : `담아둔 ${CART_TABS.find((t) => t.key === tab)?.label} 장소가 없어요`}
+                </p>
                 <p className="mt-1 text-[11.5px] text-slate-400">여행지 탐색에서 마음에 드는 곳을 담아보세요.</p>
               </div>
             ) : (
               <ul className="flex flex-col gap-2.5">
-                {items.map((item) => (
+                {visibleItems.map((item) => (
                   <li
                     key={item.id}
                     draggable
@@ -222,8 +269,9 @@ export default function FloatingCart() {
                       <div className="h-14 w-14 shrink-0 rounded-xl bg-slate-100" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <span className="inline-block rounded border border-slate-200 px-1.5 py-px text-[10px] font-semibold text-slate-400">
-                        관광지
+                      <span className="inline-flex items-center gap-1 rounded border border-slate-200 px-1.5 py-px text-[10px] font-semibold text-slate-400">
+                        <Icon icon={cartTheme(item.contentTypeId).icon} width={10} />
+                        {cartTheme(item.contentTypeId).label}
                       </span>
                       <p className="mt-1 truncate text-[13px] font-bold text-slate-800">{item.title}</p>
                       <p className="mt-0.5 text-[11px] text-slate-400">{areaName(item.areaCode)}</p>
