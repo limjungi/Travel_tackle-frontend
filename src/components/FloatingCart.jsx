@@ -194,17 +194,6 @@ export default function FloatingCart() {
           {...dropZoneProps}
           className="relative flex h-[min(620px,calc(100vh-200px))] w-[340px] flex-col overflow-hidden rounded-[24px] bg-white shadow-popup ring-1 ring-black/5"
         >
-          <div className="flex shrink-0 items-center gap-2 border-b border-slate-100 py-3.5 pl-5 pr-3">
-            <p className="flex-1 text-[13px] font-bold text-slate-700">드래그 해서 여행 장소를 추가해보세요</p>
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="장바구니 닫기"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
-            >
-              <Icon icon="solar:close-circle-linear" width={18} />
-            </button>
-          </div>
-
           {user && (
             <div className="flex shrink-0 flex-wrap gap-1.5 border-b border-slate-100 px-3 py-2.5">
               {CART_TABS.map((t) => (
