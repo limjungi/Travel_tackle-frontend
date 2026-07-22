@@ -206,7 +206,7 @@ export default function FloatingCart() {
           </div>
 
           {user && (
-            <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-slate-100 px-3 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex shrink-0 flex-wrap gap-1.5 border-b border-slate-100 px-3 py-2.5">
               {CART_TABS.map((t) => (
                 <button
                   key={t.key}
