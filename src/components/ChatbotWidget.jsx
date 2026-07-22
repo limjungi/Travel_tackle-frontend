@@ -80,11 +80,12 @@ export default function ChatbotWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    // 루트는 pointer-events-none — 닫힌 패널의 투명 영역이 아래 요소(장바구니 버튼) 클릭을 가로채지 않게
+    <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {/* Popup — floating chat window */}
       <div
         className={`relative mb-4 origin-bottom-right transition-all duration-200 ${
-          open ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'
+          open ? 'pointer-events-auto scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'
         }`}
       >
         {/* Soft blurred contact shadow, for the floating feel */}
@@ -184,7 +185,7 @@ export default function ChatbotWidget() {
       {/* Floating action button */}
       <Button
         onClick={() => setOpen((v) => !v)}
-        className={`w-14 h-14 rounded-full border-[3px] border-white shadow-float flex items-center justify-center hover:scale-105 hover:shadow-float-hover ${
+        className={`pointer-events-auto w-14 h-14 rounded-full border-[3px] border-white shadow-float flex items-center justify-center hover:scale-105 hover:shadow-float-hover ${
           open ? '' : 'animate-float'
         }`}
         aria-label={open ? '챗봇 닫기' : '챗봇 열기'}
