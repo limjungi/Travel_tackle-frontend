@@ -9,7 +9,8 @@ client.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config
-    const isAuthEndpoint = original.url?.includes('/auth/')
+    // /auth/me는 만료된 액세스 토큰을 refresh로 살려 재시도 (로그인·refresh 자체의 401은 재시도 금지)
+    const isAuthEndpoint = original.url?.includes('/auth/') && !original.url?.includes('/auth/me')
     if (err.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true
       try {

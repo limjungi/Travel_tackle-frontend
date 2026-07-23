@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
 import Card from '../ui/Card'
+import { SPOT_DRAG_TYPE } from '../../api/cart'
 
 export default function TourCard({ spot, onOpen, onAddToCart }) {
   const [added, setAdded] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [dragging, setDragging] = useState(false)
 
   async function handleQuickAdd(e) {
     e.stopPropagation()
@@ -20,11 +22,20 @@ export default function TourCard({ spot, onOpen, onAddToCart }) {
       as="div"
       role="button"
       tabIndex={0}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = 'copy'
+        e.dataTransfer.setData(SPOT_DRAG_TYPE, JSON.stringify({ contentId: spot.contentId, title: spot.title }))
+        setDragging(true)
+      }}
+      onDragEnd={() => setDragging(false)}
       onClick={() => onOpen(spot)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onOpen(spot)
       }}
-      className="relative block w-full cursor-pointer overflow-hidden text-left"
+      className={`relative block w-full cursor-pointer overflow-hidden text-left transition-opacity ${
+        dragging ? 'opacity-40' : ''
+      }`}
     >
       <div className="relative">
         {spot.imageUrl ? (
