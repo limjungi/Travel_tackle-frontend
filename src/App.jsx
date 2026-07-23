@@ -4,6 +4,7 @@ import { LanguageProvider } from './i18n'
 import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import TourExplorePage from './pages/TourExplorePage'
+import TravelerFeedPage from './pages/TravelerFeedPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import OAuthCallback from './pages/OAuthCallback'
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/explore" element={<TourExplorePage />} />
+          <Route path="/feed" element={<TravelerFeedPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />

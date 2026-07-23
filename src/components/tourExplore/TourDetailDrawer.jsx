@@ -36,10 +36,10 @@ export default function TourDetailDrawer({ contentId, onClose, onAddToCart }) {
   return (
     <>
       {/* 클릭 시 닫히는 투명 백드롭 — 배경은 어둡게 처리하지 않음 */}
-      {open && <button aria-label="상세 패널 닫기" onClick={onClose} className="fixed inset-0 z-20 cursor-default" />}
+      {open && <button aria-label="상세 패널 닫기" onClick={onClose} className="fixed inset-0 z-[55] cursor-default" />}
 
       <div
-        className={`fixed top-16 bottom-0 right-0 z-30 w-full max-w-[420px] overflow-y-auto bg-white shadow-popup transition-transform duration-300 ${
+        className={`fixed top-16 bottom-0 right-0 z-[56] w-full max-w-[420px] overflow-y-auto bg-white shadow-popup transition-transform duration-300 ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
