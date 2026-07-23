@@ -80,13 +80,12 @@ export default function ChatbotWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      {/* Popup — floating chat window. 닫혀 있을 때 레이아웃 공간을 차지하지 않도록 absolute로 배치
-          (relative + flex 흐름 안에 있으면 opacity-0/pointer-events-none이어도 투명한 히트박스가 남아
-          좁은 화면에서 피드 카드 우하단 클릭/드래그를 가로채는 문제가 있었음) */}
+    // 루트는 pointer-events-none — 닫힌 패널의 투명 영역이 아래 요소(장바구니 버튼) 클릭을 가로채지 않게
+    <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      {/* Popup — floating chat window */}
       <div
-        className={`absolute bottom-full right-0 mb-4 origin-bottom-right transition-all duration-200 ${
-          open ? 'scale-100 opacity-100' : 'pointer-events-none scale-90 opacity-0'
+        className={`relative mb-4 origin-bottom-right transition-all duration-200 ${
+          open ? 'pointer-events-auto scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'
         }`}
       >
         {/* Soft blurred contact shadow, for the floating feel */}
@@ -186,7 +185,7 @@ export default function ChatbotWidget() {
       {/* Floating action button */}
       <Button
         onClick={() => setOpen((v) => !v)}
-        className={`w-14 h-14 rounded-full border-[3px] border-white shadow-float flex items-center justify-center hover:scale-105 hover:shadow-float-hover ${
+        className={`pointer-events-auto w-14 h-14 rounded-full border-[3px] border-white shadow-float flex items-center justify-center hover:scale-105 hover:shadow-float-hover ${
           open ? '' : 'animate-float'
         }`}
         aria-label={open ? '챗봇 닫기' : '챗봇 열기'}
